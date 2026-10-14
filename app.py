@@ -1,11 +1,9 @@
 import streamlit as st
 import pandas as pd
 import plotly.graph_objects as bg
-import plotly.express as px
-from streamlit_autorefresh import st_autorefresh
 import numpy as np
 
-# Configuración de la página a pantalla completa (modo Wide)
+# Configuración de la página a pantalla completa
 st.set_page_config(
     page_title="Entre Nodos 2026 - Resultados",
     page_icon="📊",
@@ -13,30 +11,61 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# Refresco automático de la página cada 5 segundos (5000 ms)
-st_autorefresh(interval=5000, key="datarefresh")
+# Refresco automático de la página cada 4 segundos (4000 ms)
+try:
+    from streamlit_autorefresh import st_autorefresh
+    st_autorefresh(interval=4000, key="datarefresh")
+except Exception:
+    pass
 
-# CSS Personalizado para ocultar menús de Streamlit y fondo oscuro continuo
+# CSS Personalizado con Paleta de Marca, Fuente CendrickNode y Layout Oscuro
 st.markdown("""
     <style>
+    /* Importación de la fuente personalizada si existe en el repositorio */
+    @font-face {
+        font-family: 'CendrickNode';
+        src: url('CendrickNode-Extended.ttf') format('truetype');
+        font-weight: normal;
+        font-style: normal;
+    }
+
     /* Ocultar elementos predeterminados de Streamlit */
-    #MainMenu {visibility: hidden;}
-    footer {visibility: hidden;}
-    header {visibility: hidden;}
-    
-    /* Fondo azul oscuro elegante */
+    #MainMenu, footer, header {visibility: hidden;}
+    .block-container {padding-top: 1rem; padding-bottom: 0rem; padding-left: 2rem; padding-right: 2rem;}
+
+    /* Fondo principal con color exacto de marca #011533 */
     .stApp {
-        background-color: #031027;
+        background-color: #011533;
         color: #FFFFFF;
+        font-family: 'CendrickNode', 'Helvetica Neue', sans-serif;
+    }
+
+    /* Títulos e información */
+    .brand-title {
+        font-family: 'CendrickNode', sans-serif;
+        font-size: 26px;
+        font-weight: 700;
+        color: #FFFFFF;
+        line-height: 1.2;
+        margin-top: 15px;
+        margin-bottom: 20px;
     }
     
-    /* Estilo del título principal */
-    .main-title {
-        font-family: 'Helvetica Neue', sans-serif;
-        font-weight: 700;
-        font-size: 28px;
+    .subtitle-info {
+        color: #00E6FF;
+        font-size: 14px;
+        margin-bottom: 10px;
+    }
+
+    .badge-count {
+        background-color: rgba(0, 230, 255, 0.15);
+        border: 1px solid #00E6FF;
         color: #FFFFFF;
-        margin-bottom: 20px;
+        padding: 8px 15px;
+        border-radius: 8px;
+        font-size: 14px;
+        display: inline-block;
+        margin-top: 10px;
     }
     </style>
 """, unsafe_allow_html=True)
@@ -49,93 +78,108 @@ def load_data():
     try:
         df = pd.read_csv(SHEET_CSV_URL)
         return df
-    except Exception as e:
+    except Exception:
         return pd.DataFrame()
 
 df = load_data()
 
-# Nombres simplificados para el eje X
-CATEGORIAS = [
-    "Empleados sin\ncargo gerencial\ndirigen agentes\nde IA",
-    "La automatización\nreduce tareas\ndonde jóvenes\naprendían",
-    "Juicio,\nrazonamiento y\nsíntesis se\nvuelven",
-    "La geopolítica\nentra en\ndecisiones antes\nsolo",
-    "Crecer\nprofesionalmente\nya no significa\nsolo",
-    "Adaptación al\nclima extremo\nentra al trabajo\ngerencial"
+# Textos de las 6 preguntas para el eje X (exactamente como la gráfica de referencia)
+CATEGORIAS_PREGUNTAS = [
+    "Empleados sin<br>cargo gerencial<br>dirigen agentes<br>de IA Quién dirige",
+    "La automatización<br>reduce tareas<br>donde jóvenes<br>aprendían<br>trabajando Cómo<br>se aprende",
+    "Juicio,<br>razonamiento y<br>síntesis se<br>vuelven<br>diferenciales<br>educativos Qué<br>vale saber",
+    "La geopolítica<br>entra en<br>decisiones antes<br>solo empresariales<br>Dónde se decide",
+    "Crecer<br>profesionalmente<br>ya no significa solo<br>ascender Cómo<br>progresa la<br>carrera",
+    "Adaptación al<br>clima extremo<br>entra al trabajo<br>gerencial Qué<br>nuevos problemas<br>gestiona"
 ]
 
-# Layout en 2 columnas: Título / Pregunta a la izquierda, Gráfica a la derecha
-col_left, col_right = st.columns([1, 2.5])
+# Paleta de colores rotativa para los puntos según la marca
+PALETA_PUNTOS = ['#BFF400', '#00E6FF', '#FFFFFF', '#BFF400', '#00E6FF', '#FFFFFF']
 
-with col_left:
-    st.markdown("### **Entre Nodos 2026**")
-    st.markdown("<h2 class='main-title'>Hacia 2031, ¿cuánto podrían cambiar las siguientes señales de la Administración en Colombia?</h2>", unsafe_allow_html=True)
-    st.caption("Puntuación: 1 = Cambio Mínimo | 10 = Cambio Decisivo")
-    st.info(f"📥 **Respuestas registradas:** {len(df)}")
+# Estructura principal en 2 columnas: Menú e Información a la izquierda, Gráfica gigante a la derecha
+col_info, col_chart = st.columns([1, 2.6])
 
-with col_right:
+with col_info:
+    # Intento de cargar el logo si existe en el repo
+    try:
+        st.image("logo.png", width=180)
+    except Exception:
+        st.markdown("<h2 style='color:#BFF400;'>Entre Nodos</h2>", unsafe_allow_html=True)
+    
+    st.markdown("<div class='brand-title'>Hacia 2031, ¿cuánto podrían cambiar las siguientes señales de la Administración en Colombia?</div>", unsafe_allow_html=True)
+    
+    st.markdown("<div class='subtitle-info'>Puntuación: 1 = Cambio Mínimo | 10 = Cambio Decisivo</div>", unsafe_allow_html=True)
+    
+    total_respuestas = len(df) if not df.empty else 0
+    st.markdown(f"<div class='badge-count'>📥 <b>Respuestas registradas:</b> {total_respuestas}</div>", unsafe_allow_html=True)
+
+with col_chart:
     fig = bg.Figure()
 
     if not df.empty and len(df.columns) >= 7:
-        # Extraer solo las columnas de preguntas
         df_preguntas = df.iloc[:, 1:7]
         
-        # Mapeo de datos para la gráfica con pequeña variación (jitter) para evitar solapamiento exacto
         np.random.seed(42)
         
         for i, col in enumerate(df_preguntas.columns):
-            valores = pd.to_numeric(df_preguntas[col], errors='coerce').dropna()
-            
-            if not valores.empty:
-                # Agregar jitter horizontal leve para mostrar aglomeración/densidad
-                x_vals = np.full(len(valores), i) + np.random.uniform(-0.15, 0.15, size=len(valores))
-                y_vals = valores.values
+            if i < len(CATEGORIAS_PREGUNTAS):
+                valores = pd.to_numeric(df_preguntas[col], errors='coerce').dropna()
                 
-                fig.add_trace(bg.Scatter(
-                    x=x_vals,
-                    y=y_vals,
-                    mode='markers',
-                    marker=dict(
-                        size=14,
-                        color='#CCFF00', # Color neón llamativo
-                        opacity=0.6,
-                        line=dict(width=1, color='#FFFFFF')
-                    ),
-                    name=CATEGORIAS[i] if i < len(CATEGORIAS) else f"P{i+1}",
-                    showlegend=False
-                ))
+                if not valores.empty:
+                    # Jitter leve horizontal para simular el mapa de calor por densidad de puntos
+                    x_vals = np.full(len(valores), i) + np.random.uniform(-0.12, 0.12, size=len(valores))
+                    y_vals = valores.values
+                    
+                    color_columna = PALETA_PUNTOS[i % len(PALETA_PUNTOS)]
+                    
+                    fig.add_trace(bg.Scatter(
+                        x=x_vals,
+                        y=y_vals,
+                        mode='markers',
+                        marker=dict(
+                            size=16,
+                            color=color_columna,
+                            opacity=0.75,
+                            line=dict(width=1, color='#FFFFFF')
+                        ),
+                        showlegend=False,
+                        hoverinfo='y'
+                    ))
 
-    # Estilizado visual de la gráfica siguiendo el modelo de referencia
+    # Diseño gráfico estilizado en concordancia exacta con la imagen de referencia del cliente
     fig.update_layout(
         paper_bgcolor='rgba(0,0,0,0)',
-        plot_bgcolor='rgba(3, 16, 39, 0.8)',
-        height=650,
-        margin=dict(l=40, r=40, t=30, b=80),
+        plot_bgcolor='#011533',
+        height=680,
+        margin=dict(l=50, r=30, t=20, b=120),
         xaxis=dict(
             tickmode='array',
-            tickvals=list(range(len(CATEGORIAS))),
-            ticktext=CATEGORIAS,
+            tickvals=list(range(6)),
+            ticktext=CATEGORIAS_PREGUNTAS,
             showgrid=False,
             zeroline=False,
-            tickfont=dict(color='#FFFFFF', size=11),
+            tickfont=dict(color='#FFFFFF', size=11, family='CendrickNode, sans-serif'),
             showline=True,
             linecolor='#FFFFFF',
-            linewidth=2
+            linewidth=2,
+            range=[-0.5, 5.5] # Forzar visualización exacta de las 6 columnas
         ),
         yaxis=dict(
-            title="Calificación",
             range=[0.5, 10.5],
             dtick=1,
             showgrid=True,
-            gridcolor='rgba(255, 255, 255, 0.15)',
+            gridcolor='rgba(255, 255, 255, 0.2)',
             gridwidth=1,
             griddash='dot',
-            tickfont=dict(color='#FFFFFF', size=12),
+            tickfont=dict(color='#FFFFFF', size=11, family='CendrickNode, sans-serif'),
             showline=True,
             linecolor='#FFFFFF',
             linewidth=2,
             tickvals=[1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
-            ticktext=['1. Cambio Mínimo', '2', '3', '4', '5', '6', '7', '8', '9', '10. Cambio Decisivo']
+            ticktext=[
+                '1. Cambio Mínimo', '2. .....', '3. .....', '4. .....', '5. .....',
+                '6. .....', '7. .....', '8. .....', '9. .....', '10. Cambio Decisivo'
+            ]
         )
     )
 
