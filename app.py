@@ -94,7 +94,7 @@ st.markdown(f"""
 # URL Base del CSV de Google Sheets
 BASE_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTsjcnJXMu3xZYbKErvIrCUoDPbh3IU-x7h1y6EZo8vmHxCIFia8sc_OCF9NWwzvecxUjMf68nzllyr/pub?gid=746117259&single=true&output=csv"
 
-# Caché corta de 4 segundos para evitar desincronización entre nodos de Streamlit Cloud
+# Caché corta de 4 segundos para evitar desincronización
 @st.cache_data(ttl=4, show_spinner=False)
 def fetch_sheet_data(ts):
     try:
@@ -113,20 +113,19 @@ if "current_df" not in st.session_state:
     st.session_state.current_df = pd.DataFrame()
 
 if not df_new.empty:
-    # Solo reemplazamos el DataFrame si tiene igual o mayor número de respuestas que el que ya tenemos
     if len(df_new) >= len(st.session_state.current_df):
         st.session_state.current_df = df_new
 
 df = st.session_state.current_df
 
-# Textos para las 6 columnas del eje X en el orden exacto del Google Form
+# Textos exactos del Google Forms formateados para el eje X
 CATEGORIAS_PREGUNTAS = [
-    "Empleados sin<br>cargo gerencial<br>dirigen agentes<br>de IA Quién dirige",
-    "Juicio,<br>razonamiento y<br>síntesis se<br>vuelven<br>diferenciales<br>educativos Qué<br>vale saber",
-    "La automatización<br>reduce tareas<br>donde jóvenes<br>aprendían<br>trabajando Cómo<br>se aprende",
-    "Adaptación al<br>clima extremo<br>entra al trabajo<br>gerencial Qué<br>nuevos problemas<br>gestiona",
-    "La geopolítica<br>entra en<br>decisiones antes<br>solo empresariales<br>Dónde se decide",
-    "Crecer<br>profesionalmente<br>ya no significa solo<br>ascender Cómo<br>progresa la<br>carrera"
+    "Empleados sin<br>cargo gerencial<br>dirigiendo agentes<br>de IA",
+    "Juicio, razonamiento<br>y síntesis volviéndose<br>diferenciales<br>educativos",
+    "La automatización<br>reduciendo tareas<br>donde jóvenes<br>aprendían trabajando",
+    "La adaptación al<br>clima laboral extremo<br>entra al trabajo<br>gerencial",
+    "La geopolítica<br>entrando en decisiones<br>antes solo<br>empresariales",
+    "El crecimiento<br>profesional ya no<br>significa solo<br>ascender"
 ]
 
 # Colores rotativos de la paleta oficial
@@ -181,13 +180,30 @@ with col_chart:
                         hoverinfo='y'
                     ))
 
-    # Diseño gráfico con la fuente CendrickNode en los ejes
+    # Diseño gráfico con la fuente CendrickNode y líneas verticales sutiles punteadas
     fig.update_layout(
         paper_bgcolor='rgba(0,0,0,0)',
         plot_bgcolor='#011533',
         height=680,
         margin=dict(l=50, r=30, t=20, b=120),
         font=dict(family='CendrickNode, sans-serif', color='#FFFFFF'),
+        shapes=[
+            # Línea vertical punteada 1 (entre col 0 y col 1)
+            dict(
+                type="line", x0=0.5, x1=0.5, y0=0.5, y1=10.5,
+                line=dict(color="rgba(255, 255, 255, 0.25)", width=1.5, dash="dot")
+            ),
+            # Línea vertical punteada 2 (entre col 2 y col 3)
+            dict(
+                type="line", x0=2.5, x1=2.5, y0=0.5, y1=10.5,
+                line=dict(color="rgba(255, 255, 255, 0.25)", width=1.5, dash="dot")
+            ),
+            # Línea vertical punteada 3 (entre col 4 y col 5)
+            dict(
+                type="line", x0=4.5, x1=4.5, y0=0.5, y1=10.5,
+                line=dict(color="rgba(255, 255, 255, 0.25)", width=1.5, dash="dot")
+            )
+        ],
         xaxis=dict(
             tickmode='array',
             tickvals=list(range(6)),
