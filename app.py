@@ -103,14 +103,14 @@ def load_data():
 
 df = load_data()
 
-# Textos para las 6 columnas del eje X
+# Textos para las 6 columnas del eje X en el orden exacto del Google Form
 CATEGORIAS_PREGUNTAS = [
     "Empleados sin<br>cargo gerencial<br>dirigen agentes<br>de IA Quién dirige",
-    "La automatización<br>reduce tareas<br>donde jóvenes<br>aprendían<br>trabajando Cómo<br>se aprende",
     "Juicio,<br>razonamiento y<br>síntesis se<br>vuelven<br>diferenciales<br>educativos Qué<br>vale saber",
+    "La automatización<br>reduce tareas<br>donde jóvenes<br>aprendían<br>trabajando Cómo<br>se aprende",
+    "Adaptación al<br>clima extremo<br>entra al trabajo<br>gerencial Qué<br>nuevos problemas<br>gestiona",
     "La geopolítica<br>entra en<br>decisiones antes<br>solo empresariales<br>Dónde se decide",
-    "Crecer<br>profesionalmente<br>ya no significa solo<br>ascender Cómo<br>progresa la<br>carrera",
-    "Adaptación al<br>clima extremo<br>entra al trabajo<br>gerencial Qué<br>nuevos problemas<br>gestiona"
+    "Crecer<br>profesionalmente<br>ya no significa solo<br>ascender Cómo<br>progresa la<br>carrera"
 ]
 
 # Colores rotativos de la paleta oficial
@@ -120,7 +120,6 @@ PALETA_PUNTOS = ['#BFF400', '#00E6FF', '#FFFFFF', '#BFF400', '#00E6FF', '#FFFFFF
 col_info, col_chart = st.columns([1, 2.6])
 
 with col_info:
-    # Cargar el archivo con el nombre exacto de GitHub: "Logo Entre nodos.png"
     logo_path = "Logo Entre nodos.png"
     if os.path.exists(logo_path):
         st.image(logo_path, width=220)
