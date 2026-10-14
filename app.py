@@ -4,8 +4,9 @@ import plotly.graph_objects as bg
 import numpy as np
 import base64
 import os
+import time
 
-# Configuración de la página a pantalla completa (modo Wide)
+# Configuración de la página a pantalla completa
 st.set_page_config(
     page_title="Entre Nodos 2026 - Resultados",
     page_icon="📊",
@@ -13,10 +14,10 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# Refresco automático de la página cada 4 segundos
+# Refresco automático de la página cada 3 segundos
 try:
     from streamlit_autorefresh import st_autorefresh
-    st_autorefresh(interval=4000, key="datarefresh")
+    st_autorefresh(interval=3000, key="datarefresh_instant")
 except Exception:
     pass
 
@@ -90,18 +91,19 @@ st.markdown(f"""
     </style>
 """, unsafe_allow_html=True)
 
-# URL del Google Sheets publicado como CSV
-SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTsjcnJXMu3xZYbKErvIrCUoDPbh3IU-x7h1y6EZo8vmHxCIFia8sc_OCF9NWwzvecxUjMf68nzllyr/pub?gid=746117259&single=true&output=csv"
+# URL Base del CSV de Google Sheets
+BASE_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTsjcnJXMu3xZYbKErvIrCUoDPbh3IU-x7h1y6EZo8vmHxCIFia8sc_OCF9NWwzvecxUjMf68nzllyr/pub?gid=746117259&single=true&output=csv"
 
-@st.cache_data(ttl=2)
-def load_data():
+# Función de lectura SIN CACHÉ y con burlador de caché (timestamp) para forzar lectura en vivo de Google
+def load_data_live():
     try:
-        df = pd.read_csv(SHEET_CSV_URL)
+        timestamp_url = f"{BASE_CSV_URL}&_nocache={int(time.time() * 1000)}"
+        df = pd.read_csv(timestamp_url)
         return df
     except Exception:
         return pd.DataFrame()
 
-df = load_data()
+df = load_data_live()
 
 # Textos para las 6 columnas del eje X en el orden exacto del Google Form
 CATEGORIAS_PREGUNTAS = [
