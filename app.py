@@ -180,7 +180,7 @@ with col_chart:
                         hoverinfo='y'
                     ))
 
-    # Diseño gráfico con la fuente CendrickNode y líneas verticales sutiles punteadas
+    # Diseño gráfico con la fuente CendrickNode y las 3 líneas verticales en las posiciones exactas
     fig.update_layout(
         paper_bgcolor='rgba(0,0,0,0)',
         plot_bgcolor='#011533',
@@ -188,19 +188,19 @@ with col_chart:
         margin=dict(l=50, r=30, t=20, b=120),
         font=dict(family='CendrickNode, sans-serif', color='#FFFFFF'),
         shapes=[
-            # Línea vertical punteada 1 (entre col 0 y col 1)
+            # Línea 1: Separa Pregunta 1 (sola) de la Pregunta 2 (x = 0.5)
             dict(
                 type="line", x0=0.5, x1=0.5, y0=0.5, y1=10.5,
                 line=dict(color="rgba(255, 255, 255, 0.25)", width=1.5, dash="dot")
             ),
-            # Línea vertical punteada 2 (entre col 2 y col 3)
+            # Línea 2: Separa Pregunta 2 (sola) de las Preguntas 3 y 4 (x = 1.5)
             dict(
-                type="line", x0=2.5, x1=2.5, y0=0.5, y1=10.5,
+                type="line", x0=1.5, x1=1.5, y0=0.5, y1=10.5,
                 line=dict(color="rgba(255, 255, 255, 0.25)", width=1.5, dash="dot")
             ),
-            # Línea vertical punteada 3 (entre col 4 y col 5)
+            # Línea 3: Separa Preguntas 3 y 4 de las Preguntas 5 y 6 (x = 3.5)
             dict(
-                type="line", x0=4.5, x1=4.5, y0=0.5, y1=10.5,
+                type="line", x0=3.5, x1=3.5, y0=0.5, y1=10.5,
                 line=dict(color="rgba(255, 255, 255, 0.25)", width=1.5, dash="dot")
             )
         ],
